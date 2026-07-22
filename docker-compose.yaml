@@ -1,0 +1,11 @@
+services:
+  mysql-example-service:
+    image: mysql:latest
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=example-service-database
+      - MYSQL_DATABASE=example-service-database
+      - MYSQL_USER=example-service-database
+      - MYSQL_PASSWORD=example-service-database
+    ports:
+      - '3306:3306'

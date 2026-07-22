@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: integration-service API
+  version: 1.0.0
+tags:
+  - name: Metrics
+    description: Operational and metrics endpoints
+paths:
+  /actuator/prometheus:
+    get:
+      tags:
+        - Metrics
+      summary: Prometheus scrape endpoint
+      operationId: prometheus
+      responses:
+        '200':
+          description: Prometheus format metrics
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /actuator/health:
+    get:
+      tags:
+        - Metrics
+      summary: Application health status
+      operationId: health
+      responses:
+        '200':
+          description: health details
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /actuator/env:
+    get:
+      tags:
+        - Metrics
+      summary: Safe environment properties
+      operationId: env
+      responses:
+        '200':
+          description: environment details
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /actuator/metrics:
+    get:
+      tags:
+        - Metrics
+      summary: List available metrics
+      operationId: metrics
+      responses:
+        '200':
+          description: metrics overview
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /actuator/metrics/jvm.memory.used:
+    get:
+      tags:
+        - Metrics
+      summary: JVM used memory metric
+      operationId: jvmMemoryUsed
+      responses:
+        '200':
+          description: jvm memory used metric
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /actuator/metrics/process.uptime:
+    get:
+      tags:
+        - Metrics
+      summary: Process uptime metric
+      operationId: processUptime
+      responses:
+        '200':
+          description: process uptime metric
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /actuator/health/readiness:
+    get:
+      tags:
+        - Metrics
+      summary: Readiness probe
+      operationId: readiness
+      responses:
+        '200':
+          description: readiness status
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+
+  /actuator/health/liveness:
+    get:
+      tags:
+        - Metrics
+      summary: Liveness probe
+      operationId: liveness
+      responses:
+        '200':
+          description: liveness status
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+components: {}

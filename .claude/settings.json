@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Bash",
+      "Edit",
+      "Write",
+      "Read",
+      "WebFetch",
+      "WebSearch",
+      "Bash(mvn *)",
+      "Bash(./mvnw *)",
+      "Bash(echo *)",
+      "Bash(make *)",
+      "Bash(docker  *)",
+      "Bash(curl *)"
+    ],
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Read(./**/.env*)",
+      "Read(./**/application-prod*)"
+    ]
+  }
+}

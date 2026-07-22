@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: example/2026-07-14-create-example-table.sql
+      relativeToChangelogFile: true

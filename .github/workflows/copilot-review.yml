@@ -1,0 +1,27 @@
+name: Request Copilot Review
+
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  request-copilot-review:
+    name: Request GitHub Copilot Review
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Request Copilot as reviewer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          if ! gh pr edit "$PR_NUMBER" --repo "$REPOSITORY" --add-reviewer @copilot; then
+            echo "::warning::Could not request @copilot as reviewer. Confirm GitHub Copilot Code Review is enabled for this repository or organization."
+          fi
