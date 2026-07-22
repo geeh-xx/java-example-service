@@ -255,6 +255,58 @@ Open problems:
 Suggested next step:
 - Continue normalizing skeleton documentation as additional project conventions are clarified.
 
+## 2026-07-22 - Add Feature Spec Grill Skill
+
+Summary:
+- Created `.agents/skills/feature-spec-grill/SKILL.md`, adapting the `grill-with-docs`
+  interview-first idea for this project's `docs/features` workflow.
+- Added `.agents/skills/feature-spec-grill/references/feature-docs.md` with the local
+  feature folder rules.
+- Added `.agents/skills/feature-spec-grill/assets/SPEC.md` based on the project feature
+  spec template.
+- Updated `.agents/README.md` and `.agents/agent-workflow.md` so agents know when to use
+  the local skill.
+
+Decisions:
+- Kept the skill local under `.agents/skills` as requested instead of installing it under
+  `~/.codex/skills`.
+- Made the skill generate documentation only; implementation remains a separate workflow.
+- Preserved the skeleton principle by requiring questions before business behavior is
+  documented.
+
+Verification:
+- Confirmed the skill files exist and are discoverable from `.agents/README.md`.
+- Attempted to run the Codex skill validator; direct execution was blocked by file
+  permissions, and running it through Python failed because the local Python environment is
+  missing `yaml`.
+
+Open problems:
+- Automatic skill validation has not run because `PyYAML` is unavailable locally.
+
+Suggested next step:
+- Use `.agents/skills/feature-spec-grill/SKILL.md` on the next new feature request to test
+  whether the question flow captures enough detail before writing `SPEC.md`.
+
+---
+
+## 2026-07-22 - Revert Agent Workflow Skill Reference
+
+Summary:
+- Reverted the change that referenced `feature-spec-grill` from `.agents/agent-workflow.md`.
+
+Decisions:
+- Kept the new skill under `.agents/skills/feature-spec-grill/`, but did not alter the
+  core agent workflow to force or advertise its use.
+
+Verification:
+- Confirmed only the workflow reference was reverted.
+
+Open problems:
+- None.
+
+Suggested next step:
+- Use the new skill explicitly when requested, without changing the core workflow.
+
 ---
 
 ## 2026-07-22 - Use Controller Request Directly In Create User Use Case
@@ -281,6 +333,30 @@ Verification:
 Open problems:
 - Maven/JDK still emits warnings about restricted native access and Mockito dynamic agent
   self-attachment; they do not fail the tests.
+
+Suggested next step:
+- Continue normalizing skeleton documentation as additional project conventions are clarified.
+
+---
+
+## 2026-07-22 - List Development Flow Skill In Agents README
+
+Summary:
+- Updated `.agents/README.md` to list the existing `.agents/skills/development-flow/SKILL.md`
+  local skill.
+- Corrected the workflow guide path in `.agents/README.md` from
+  `knowledge/agent-workflow.md` to `agent-workflow.md`.
+
+Decisions:
+- Documented the existing `development-flow` skill path instead of creating a duplicate
+  skill for the misspelled `development-wprkflow` name.
+
+Verification:
+- Confirmed `.agents/skills/development-flow/SKILL.md` exists.
+- Confirmed `.agents/README.md` now references both local skills.
+
+Open problems:
+- None.
 
 Suggested next step:
 - Continue normalizing skeleton documentation as additional project conventions are clarified.
