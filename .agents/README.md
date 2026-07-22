@@ -11,8 +11,8 @@ Each file here is a focused rulebook; load only what the task needs.
 | `knowledge/ddd.md` | Domain model, events, input types, JPA mapping rules |
 | `knowledge/messaging.md` | RabbitMQ consumers, CloudEvents envelope, outbox, ShedLock |
 | `knowledge/database.md` | Liquibase conventions, MySQL naming, datasources |
-| `knowledge/knowledge/api.md` | OpenAPI-First REST, Springwolf AsyncAPI, HTTP semantics |
-| `knowledge/knowledge/security.md` | JWT resource server, secrets handling, CORS |
+| `knowledge/api.md` | OpenAPI-First REST, Springwolf AsyncAPI, HTTP semantics |
+| `knowledge/security.md` | JWT resource server, secrets handling, CORS |
 | `knowledge/testing.md` | Unit tests, Cucumber/Testcontainers, coverage gates |
 | `knowledge/observability.md` | Logback/MDC, OpenTelemetry, metrics, never-log list |
 | `production-readiness.md` | Pre-deploy checklist |

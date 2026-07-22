@@ -1,4 +1,4 @@
-# AGENTS.md — integration-service
+# AGENTS.md — example-service
 
 > Primary entry point for AI coding agents (Claude Code, Copilot, Cursor, Aider, …) working in
 > this repository. Agent-specific files (`CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`)
@@ -83,17 +83,25 @@ Feature specs live in `docs/features/<feature>/` (see `docs/features/README.md`)
   rate limit and call budget** — never call a provider SDK/HTTP API directly from a use case,
   consumer or scheduler (`.agents/knowledge/integrations.md`).
 - Do not put business logic in controllers, queue consumers or infrastructure adapters.
+- A use case may receive the request object passed by the controller, but it must not return
+  a domain model/JPA entity to the controller. Return an output/result DTO instead.
 - Do not call RabbitMQ directly from a use case — outbox pattern only.
 - No database schema change without a new Liquibase changelog.
 - Do not hardcode secrets, queue names or provider credentials.
 - Never log tokens, secrets or raw provider payloads (`.agents/knowledge/observability.md`).
 - Do not create duplicate abstractions when the project already has a pattern.
+- Required method parameters use Lombok `@NonNull`; read-only parameters, locals and fields
+  use Java `final`.
+- Persistent domain entities extend `BaseEntity<ID>`; aggregate roots extend
+  `AggregateRoot<ID>` and expose mutation only through behavior methods.
+- JPA entities use `@Getter`, `@Entity`, `@Table(name = "<table_name>")` and
+  `@NoArgsConstructor(access = AccessLevel.PROTECTED)`.
 - Add or update tests for every behavior change (unit + Cucumber scenario).
 - **Cucumber BDD tests are REAL integration tests running on Testcontainers**: the full
   Spring application boots against real MySQL and RabbitMQ containers. Never mock the
   database, the broker, repositories or use cases in a Cucumber scenario — the only
   permitted stub is the external provider's HTTP API (WireMock), because we cannot call
-  the real Xero from CI (`.agents/knowledge/testing.md`).
+  the real externals api from CI (`.agents/knowledge/testing.md`).
 - Update `LOG.md` at the end of the session (Rule #0).
 
 ---
@@ -107,10 +115,10 @@ Feature specs live in `docs/features/<feature>/` (see `docs/features/README.md`)
 | Build tool | Maven (single module) — `make` wraps common tasks |
 | Messaging | RabbitMQ (Spring AMQP) + CloudEvents v1.0 JSON envelope |
 | Database | MySQL 8 (Liquibase migrations, `src/main/resources/db/changelog/`) |
-| Resilience | Bucket4j + Redis for distributed provider rate limiting; retry/circuit-breaker policies per provider when needed |
+| Resilience | Retry/circuit-breaker policies defined by the concrete service |
 | Mappers | MapStruct + Lombok (see `lombok.config`) |
 | Unit testing | JUnit 5 · Mockito · Instancio · AssertJ (JaCoCo ≥ 80%) |
-| BDD testing | Cucumber 7 · Testcontainers (MySQL, RabbitMQ) — Maven profile `cucumber` |
+| BDD testing | Cucumber 7 · Testcontainers (MySQL) — Maven profile `it-test` |
 | API contract | OpenAPI (`docs/openapi.yaml`) for REST · AsyncAPI via Springwolf for queues |
 | Observability | SLF4J/Logback + MDC (`eventId`, `source`) · OpenTelemetry OTLP · Micrometer/Prometheus |
 | Scheduling | ShedLock on every `@Scheduled` |
@@ -136,7 +144,7 @@ Feature specs live in `docs/features/<feature>/` (see `docs/features/README.md`)
 1. `docs/features/<feature>/SPEC.md` (+ `DATABASE.md`, `API.md`, `MESSAGING.md` as needed)
 2. Gherkin `.feature` → `src/test/resources/features/<domain>/`
 3. Contract update → `docs/openapi.yaml` (REST) and/or CloudEvents payload (messaging)
-4. Domain model/event/input → `src/main/java/com/f360/integrationservice/domain/{model,event,input}/`
+4. Domain model/event → `src/main/java/com/{your-domain}/integrationservice/domain/{model,event}/`
 5. Use case (interface + Impl) → `application/usecase/<domain>/<feature>/`
 6. MapStruct mapper → `application/mapper/`
 7. Liquibase changelog → `src/main/resources/db/changelog/`
@@ -170,7 +178,7 @@ com.{your-domain}.exampleservice
  ├── domain
  │    ├── model            # entities and core domain models (JPA entities)
  │    ├── event            # domain events
- │    ├── input            # use-case input/command types
+ │    ├── input            # optional use-case input/command types, only when a request DTO is not enough
  ├── application
  │    ├── usecase          # one sub-package per domain feature (interface + Impl)
  │    ├── dto
@@ -193,7 +201,7 @@ com.{your-domain}.exampleservice
 ```
 
 **Do not change this layout.** New integrations add packages *inside* the existing ones
-(e.g. `infrastructure/web/client/xero/`, `application/usecase/connection/…`) — see
+(e.g. `infrastructure/web/client/<domain>/`, `application/usecase/connection/…`) — see
 `.agents/knowledge/architecture.md` and `.agents/knowledge/integrations.md`.
 
 ---
@@ -203,10 +211,10 @@ com.{your-domain}.exampleservice
 Branches: `feature/<desc>` · `fix/<desc>` · `chore/<desc>` · `refactor/<desc>` · `test/<desc>`
 
 Conventional Commits — types `feat|fix|test|refactor|chore|docs|ci`, scopes
-`connection | sync | push | webhook | outbox | xero | infra | db`:
+`connection | sync | push | webhook | outbox | <domain> | infra | db`:
 
 ```
-feat(connection): add xero oauth callback handling
+feat(connection): add <domain>  oauth callback handling
 fix(outbox): prevent duplicate dispatch on retry
 test(sync): add cucumber scenario for budget exhaustion
 ```
@@ -222,7 +230,7 @@ feature spec (`docs/features/<feature>/SPEC.md`) or ticket.
 make infra-up        # MySQL + RabbitMQ via docker-compose
 make unit-test       # mvn test
 make coverage        # mvn verify + JaCoCo HTML report
-make it-test         # mvn clean verify -P cucumber (Testcontainers; Docker required)
+make it-test         # mvn clean verify -P it-test (Testcontainers; Docker required)
 make run             # build + spring-boot:run
 make deploy          # TeamCity deploy (needs TEAM_CITY_TOKEN in .env, VPN)
 ```
@@ -242,6 +250,11 @@ make deploy          # TeamCity deploy (needs TEAM_CITY_TOKEN in .env, VPN)
 | Poll a DISCONNECTED connection | Reconnection is a user action; unattended polling stops |
 | `@Autowired` on fields | Constructor injection |
 | `@Data` on JPA entities | `@Getter` + behavior methods for mutation |
+| Public no-arg constructor on JPA entity | `@NoArgsConstructor(access = AccessLevel.PROTECTED)` |
+| JPA entity without explicit table mapping | `@Table(name = "<table_name>")` |
+| Required method parameter without null contract | Lombok `@NonNull` on the parameter |
+| Reassigning read-only values | Java `final` on parameters, locals and fields |
+| Aggregate root as a plain entity | Extend `AggregateRoot<ID>` |
 | Business logic in consumers/controllers/mappers | Delegate to use cases |
 | Calling RabbitMQ from a use case | Outbox table via `MessagePublisher`; `OutboxProcessor` dispatches |
 | `@Scheduled` without `@SchedulerLock` | Always pair them |

@@ -3,6 +3,6 @@ spring:
     activate:
       on-profile: local
   datasource:
-    url: jdbc:mysql://localhost:3306/integration-service-database
+    url: jdbc:mysql://localhost:3306/example-service-database
     username: root
     password: root

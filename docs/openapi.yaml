@@ -1,12 +1,38 @@
 openapi: 3.0.3
 info:
-  title: integration-service API
+  title: example-service API
   version: 1.0.0
 tags:
+  - name: Users
+    description: User endpoints
   - name: Metrics
     description: Operational and metrics endpoints
 paths:
-  /actuator/prometheus:
+  /v1/users:
+    post:
+      tags:
+        - Users
+      summary: Create user
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: Created user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Validation error
+        '409':
+          description: Email already registered
+
+  /management/prometheus:
     get:
       tags:
         - Metrics
@@ -20,7 +46,7 @@ paths:
               schema:
                 type: string
 
-  /actuator/health:
+  /management/health:
     get:
       tags:
         - Metrics
@@ -35,7 +61,7 @@ paths:
                 type: object
                 additionalProperties: true
 
-  /actuator/env:
+  /management/env:
     get:
       tags:
         - Metrics
@@ -50,7 +76,7 @@ paths:
                 type: object
                 additionalProperties: true
 
-  /actuator/metrics:
+  /management/metrics:
     get:
       tags:
         - Metrics
@@ -65,7 +91,7 @@ paths:
                 type: object
                 additionalProperties: true
 
-  /actuator/metrics/jvm.memory.used:
+  /management/metrics/jvm.memory.used:
     get:
       tags:
         - Metrics
@@ -80,7 +106,7 @@ paths:
                 type: object
                 additionalProperties: true
 
-  /actuator/metrics/process.uptime:
+  /management/metrics/process.uptime:
     get:
       tags:
         - Metrics
@@ -95,7 +121,7 @@ paths:
                 type: object
                 additionalProperties: true
 
-  /actuator/health/readiness:
+  /management/health/readiness:
     get:
       tags:
         - Metrics
@@ -110,7 +136,7 @@ paths:
                 type: object
                 additionalProperties: true
 
-  /actuator/health/liveness:
+  /management/health/liveness:
     get:
       tags:
         - Metrics
@@ -124,4 +150,40 @@ paths:
               schema:
                 type: object
                 additionalProperties: true
-components: {}
+components:
+  schemas:
+    CreateUserRequest:
+      type: object
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+          example: Example User
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: user@example.com
+    UserResponse:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - createdDate
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        createdDate:
+          type: string
+          format: date-time

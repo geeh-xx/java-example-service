@@ -20,7 +20,7 @@ CREATED ──connect──► CONNECTED ──auth error──► FAILED ──
 ```
 
 1. Tokens are checked for expiry before every call; refresh proactively; persist rotated
-   refresh tokens **immediately** (Xero refresh tokens are single-use).
+   refresh tokens **immediately** (refresh tokens are single-use).
 2. First 401/403-consent error → refresh once → retry once.
 3. Refresh rejected → `DISCONNECTED`; **all unattended polling for that connection stops**.
    Only a user-driven reconnect revives it.
@@ -34,7 +34,7 @@ capabilities such as sync, but refresh happens only because a provider call is a
 
 ## Rate limits and call budgets
 
-- Per provider+tenant: rate limiter (e.g. Xero 60 calls/min, 80% headroom) and **daily call
+- Per provider/tenant: rate limiter (e.g. 60 calls/min, 80% headroom) and **daily call
   budget** (e.g.some api 5.000/day, alert at 70%) — Resilience4j + a `call_budget` counter.
 - On 429: honor `Retry-After`; never burst.
 - Budget exhausted → the sync job re-queues the remainder for the next window; it does not

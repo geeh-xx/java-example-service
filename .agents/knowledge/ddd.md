@@ -8,13 +8,15 @@
 - `domain/event` — immutable domain events
   (`ConnectionDisconnectedEvent`, `SyncCompletedEvent`, …), raised by aggregates and
   converted to outbox messages by infrastructure listeners.
-- `domain/input` — use-case input/command types (records, validated).
+- `domain/input` — optional use-case input/command types. Create these only when the
+  controller request object is not a good use-case input.
 
 ## Rules
 
 - Every persistent domain class extends `BaseEntity<ID>` (audit columns, `@Version`
-  optimistic locking + id-based equality); aggregate roots extend `AggregateRoot<ID>`
-  (also records the domain events raised by behavior methods via `registerEvent`).
+  optimistic locking + id-based equality).
+- Every aggregate root MUST extend `AggregateRoot<ID>`; it records domain events raised by
+  behavior methods via `registerEvent`.
 - **ID type rule**: if the entity is exposed through the API or used in any external
   communication (events, provider calls, webhooks) the id MUST be `UUID`
   (application-generated); if it is strictly internal, the id MUST be `Long`
@@ -26,8 +28,10 @@
   java-uuid-generator) — time-ordered, index-friendly. Use the shared wrapper
   `shared/util/Uuids.newUuid()` (single generator instance); never `UUID.randomUUID()`
   in production code.
-- Aggregates guard their invariants: state transitions happen through behavior methods
-  (`connection.markDisconnected(reason, traceId)`), never through public setters.
+- Aggregates guard their invariants: state transitions happen through behavior methods,
+  never through public setters.
+- Creation/factory methods and behavior methods on aggregates use Lombok `@NonNull` for
+  required arguments and `final` for read-only parameters/local values.
 - The **Connection state machine** (CREATED → CONNECTED → FAILED → DISCONNECTED) is domain
   logic — transitions and their guards live on the aggregate, not in schedulers or gateways.
 - The **call budget** policy (what happens when a provider budget is exhausted) is domain
@@ -41,7 +45,20 @@
 
 ## JPA mapping rules
 
-- `@Getter` only + behavior methods; protected no-arg constructor for JPA.
+- JPA entities use these annotations explicitly:
+
+  ```java
+  @Getter
+  @Entity
+  @Table(name = "<table_name>")
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  ```
+
+- Use `@Getter` only + behavior methods; no public setters for aggregate state.
+- Use `@NoArgsConstructor(access = AccessLevel.PROTECTED)` for the JPA constructor.
+- Always declare `@Table(name = "<table_name>")`; table names are `snake_case`.
+- Aggregate roots extend `AggregateRoot<ID>`; non-root persistent entities extend
+  `BaseEntity<ID>`.
 - No bidirectional relations unless truly needed; prefer ids + explicit queries.
 - Collections: lazy by default; be explicit about fetch strategies used by each query.
-- Every entity change ships with its Liquibase changelog (`.agents/database.md`).
+- Every entity change ships with its Liquibase changelog (`.agents/knowledge/database.md`).

@@ -201,7 +201,7 @@ public class MetricsController implements MetricsApi {
 			metricsResponse.put("prometheusEnabled", this.prometheusMeterRegistry != null);
 
 			if (this.prometheusMeterRegistry != null) {
-				metricsResponse.put("prometheusEndpoint", "/actuator/prometheus");
+				metricsResponse.put("prometheusEndpoint", "/management/prometheus");
 			}
 
 			return ResponseEntity.ok(metricsResponse);

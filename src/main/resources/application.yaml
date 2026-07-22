@@ -2,12 +2,12 @@ server:
   port: 8080
 spring:
   application:
-    name: integration-service
+    name: example-service
     version: '@project.version@'
   profiles:
     active: '@activatedProfile@'
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/integration-service}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/example-service}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver

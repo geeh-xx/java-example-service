@@ -1,11 +1,11 @@
-# integration-service - README
+# example-service - README
 
-project for integration external sistem to f360
+project for integration external system
 
 # 1) Technologies and Architecture
 
 
-- **Languages & Build**: Java 25, Maven (multi-module reactor), Using BDD and domain events
+- **Languages & Build**: Java 25, Maven (single module), using BDD-oriented specs
 - **Dependencies**:
     - Spring Boot 4 (AMQP, Data JPA, spring-boot-starter-liquibase, Test)
     - Lombok (boilerplate reduction)
@@ -17,14 +17,14 @@ project for integration external sistem to f360
     - OpenTelemetry OTLP Exporter (telemetry data export)
     - OpenTelemetry Spring Boot Starter (auto-instrumentation)
 - **Testing**:
-    - Cucumber 7 (JUnit Platform engine)
-    - Testcontainers (MySQL and RabbitMQ for integration tests)
     - JUnit 5
-- **Modules**:
+    - Spring Boot Test
+    - Instancio
+- **Main packages**:
     - `domain`: Entities and core domain models
     - `application`: Use cases and commands (e.g., `RegisterEmailReceivedCommand`)
-    - `infrastructure`: Adapters (AMQP consumers/producers, persistence, Liquibase), application wiring and configuration
-    - `test`: Cucumber integration tests and supportive test configuration
+    - `infrastructure`: Adapters (web controllers, persistence, Liquibase), application wiring and configuration
+    - `shared`: Shared utilities and constants
 
 ### Project structure:
 
@@ -124,15 +124,12 @@ Responsibilities:
 
 # 5) Documentation
 
-### Async API (QUEUES) :
-Queues documentation (AsyncAPI) is auto-generated via Springwolf:
-- Access the docs at [local documentation](http://localhost:8080/springwolf/asyncapi-ui.html) when the app is running locally.
-
 ### Health Checks:
-- Access health checks at [local health](http://localhost:8080/actuator/)
+- Access health checks at [local health](http://localhost:8080/management/health)
 
 # 6) Tests
-The project includes unit tests and BDD-style integration tests.
+The project currently includes unit tests. BDD-style integration tests can be added by
+configuring Cucumber/Testcontainers and the corresponding Maven profile.
 
 ### Unit Tests:
 - The minimum coverage should be 80% for unit tests.
@@ -143,22 +140,22 @@ The project includes unit tests and BDD-style integration tests.
     -  `make coverage`
 
 ### Integration Tests:
-- Every use case should have at least minimum one Cucumber scenario.
-- The scenarios are located in `test/src/test/resources/features/` and need to be written in Gherkin syntax.
+- Cucumber/Testcontainers integration tests are not configured yet.
+- When configured, scenarios should live in `src/test/resources/features/` and be written in Gherkin syntax.
     - [Gherkin reference](https://cucumber.io/docs/bdd/better-gherkin)
-- Step definitions and supportive test code are in `test/src/test/java/`.
-- Integration tests use Testcontainers to spin up MySQL and RabbitMQ instances.
+- Step definitions and supportive test code should live in `src/test/java/`.
+- Integration tests should use real infrastructure through Testcontainers when possible.
 - Run integration tests with:
-    - `mvn verify -P cucumber` or `make it-test`
-- Reports are generated in `test/target/cucumber-reports/` (HTML, JSON, JUnit XML).
+    - `mvn verify -P it-test` or `make it-test`
+- Reports are generated under `target/cucumber-reports/` when the profile is configured.
 
 ### Notes:
-- Integration tests use Testcontainers; Docker must be running.
-- Integration tests are isolated under the `cucumber` Maven profile with Failsafe and do not run with unit tests.
+- Integration tests using Testcontainers require Docker.
+- The `it-test` Maven profile runs Cucumber/Testcontainers scenarios and reports.
 
 ### Reports and artifacts:
-- Cucumber HTML: `test/target/cucumber-reports/ExtentReports.html`
-- Cucumber JSON/JUnit (if configured by plugins): under `test/target/cucumber-reports/`
+- Cucumber HTML: `target/cucumber-reports/cucumber.html`
+- Cucumber JSON/JUnit: `target/cucumber-reports/cucumber.json` and `target/cucumber-reports/cucumber.xml`
 
 
 # 7) Make targets and how to run integration tests
@@ -166,10 +163,10 @@ The project includes unit tests and BDD-style integration tests.
 ### The project ships a `Makefile` with common tasks:
 
 - `make clean`
-    - Runs `mvn clean` across the reactor.
+    - Runs `mvn clean`.
 
 - `make install`
-    - Cleans and builds all modules without running tests.
+    - Cleans and builds the module without running tests.
 
 - `make unit-test`
     - Runs unit tests (`mvn test`).
@@ -183,37 +180,11 @@ The project includes unit tests and BDD-style integration tests.
 - `make infra-up` / `make infra-down` / `make infra-reset`
     - Manage local infra via `docker-compose` (if you choose to run MySQL/RabbitMQ locally).
 
-- `make integration-test`
+- `make it-test`
     - Execute Cucumber integration tests with Testcontainers:
-    - Internally runs: `mvn clean verify -P integration-test`
-    - Opens the HTML report at `test/target/cucumber-reports/ExtentReports.html` (macOS `open`).
-
-# 8) Deploy in Dev environment
-
-Be sure you are connected to the VPN and have access to the TeamCity server.
-
-Go to the [team city profile page](https://teamcity.ppsystem.net/profile.html?item=accessTokens) and generate a new token.
-
-Add token to your .env file:
-
-```bash
-TEAM_CITY_TOKEN=your_generated_token_here
-```
-
-Commit and push your changes.
-
-Then run the following command to trigger the deployment:
-
-- `make deploy`
-    - Start a deployment for the current branch.
-
-- `make deploy BRANCH=branch_name`
-    - Start a deployment for the specified branch (e.g., `main` or `develop`).
-
-- `make deploy BRANCH=branch_name TOKEN=xxxx`
-    - Start a deployment for the specified branch and token.
+    - Internally runs: `mvn clean verify -P it-test`
+    - Generates reports under `target/cucumber-reports/`.
 
 ### Manual Maven commands (without Make):
 - Run integration tests only:
-    - From repo root: `mvn -q -P integration-test verify`
-    - Or from `test/` module: `../mvnw -q -P integration-test verify`
+    - From repo root: `mvn -q -P it-test verify`

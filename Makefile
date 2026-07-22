@@ -15,7 +15,7 @@ coverage: clean
 	open target/site/jacoco/index.html
 
 it-test:
-	mvn clean verify -P cucumber
+	mvn clean verify -P it-test
 
 run: install
 	mvn spring-boot:run

@@ -10,7 +10,7 @@
   specific values.
 - No Spring context in unit tests — plain constructors and mocks.
 
-## BDD integration tests (`make it-test` → `mvn clean verify -P cucumber`)
+## BDD integration tests (`make it-test` → `mvn clean verify -P it-test`)
 
 **Cucumber BDD tests are REAL integration tests. This is non-negotiable.**
 
@@ -30,7 +30,7 @@ end-to-end on **Testcontainers**:
 
 Practicalities:
 
-- Docker is required (`make it-test`); Cucumber 7 runs under the `cucumber` Maven profile,
+- Docker is required (`make it-test`); Cucumber 7 runs under the `it-test` Maven profile,
   isolated from unit tests.
 - Features in `src/test/resources/features/<domain>/`, Gherkin syntax
   ([better-gherkin](https://cucumber.io/docs/bdd/better-gherkin)); step definitions in

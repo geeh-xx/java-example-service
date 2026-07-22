@@ -6,8 +6,8 @@
   and **`source`**; provider flows add `connectionId`, `provider`, `capability`, `companyId`.
 - Log at the boundaries: what was received (ids, not payloads), which use case ran, which
   aggregate was affected, success/failure, duration, why it failed.
-- Prefix log messages with the method context: `log.info("[completeConnection] ...")` —
-  same convention as the other f360 services.
+- Prefix log messages with the method context: `log.info("[completeConnection] ...")` 
+
 
 **Allowed in logs:** event/aggregate/connection ids, tenant/company ids, CloudEvent ids,
 correlation ids, statuses, durations, HTTP status codes.
@@ -21,7 +21,7 @@ correlation ids, statuses, durations, HTTP status codes.
 - Auto-instrumentation via the OTel Spring Boot starter; add `@WithSpan` +
   span attributes (`connectionId`, `provider`, `capability`) on use cases and provider gateways.
 - Propagate context through RabbitMQ: `traceparent` as a CloudEvents extension attribute,
-  restored by consumers — a command on spend_api must be traceable to the provider call here.
+  restored by consumers — a command on <domain> must be traceable to the provider call here.
 - Persist the trace id on connection status transitions (`status_changed_by_trace_id`)
   so production forensics never depends on log retention.
 
@@ -42,6 +42,3 @@ Minimum set per provider+tenant:
 - connection flip-flopping CONNECTED↔FAILED
 - outbox/webhook backlog growth, DLQ non-empty
 - sync lag SLO breach (p95 < 2× the capability's scheduled interval)
-
-These alerts exist because their absence let the Jul/2026 Xero 401 loop and the Revolut
-over-polling run for months unnoticed.

@@ -22,7 +22,7 @@ SPEC.md  →  .feature (Gherkin)  →  failing unit test  →  minimum code  →
 - The `.feature` file comes **before** production code — it encodes the acceptance criteria
   from the SPEC.
 - Cucumber scenarios are **real integration tests**: full app boot + real MySQL/RabbitMQ via
-  Testcontainers, nothing internal mocked (see `.agents/testing.md`).
+  Testcontainers, nothing internal mocked (see `.agents/knowledge/testing.md`).
 - Unit tests mirror each production class (`XxxUseCaseImpl` → `XxxUseCaseImplTest`).
 - A feature is not done until all coverage gates are verified:
   - every domain class has 100% coverage;
