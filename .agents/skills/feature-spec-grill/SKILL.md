@@ -23,21 +23,45 @@ and `docs/features/_template/SPEC.md` when present.
 ## Workflow
 
 1. Identify the feature name and next `featureNN-kebab-name` folder.
-2. Ask questions before writing files. Do not invent business behavior.
-3. Keep questions pointed and grouped; stop when answers are sufficient for a useful draft.
-4. Generate `SPEC.md` first from `assets/SPEC.md`.
-5. Generate companion docs only when answers require them:
+2. Run an interactive interview before writing files. Do not invent business behavior.
+3. Ask exactly one question at a time and wait for the user's answer before continuing.
+4. For every question, provide 2-4 concrete answer options numbered with `1.`, `2.`,
+   `3.` and `4.` as needed, plus:
+   - `Discuss this` — when the user wants to chat about tradeoffs before choosing.
+   - `Other` — when the user wants to provide a custom answer.
+5. Keep each question pointed; stop when answers are sufficient for a useful draft.
+6. Generate `SPEC.md` first from `assets/SPEC.md`.
+7. Generate companion docs only when answers require them:
    - `DATABASE.md` for schema, Liquibase, seed or migration changes.
    - `API.md` for REST endpoints, request/response contracts or OpenAPI changes.
    - `MESSAGING.md` for queues, events, commands or payloads.
    - `OBSERVABILITY.md` for feature-specific metrics, logs, alerts or SLOs.
-6. Keep the feature business-agnostic unless the user explicitly gives domain rules.
-7. Do not implement production code from this skill. Stop after docs unless the user asks
+8. Keep the feature business-agnostic unless the user explicitly gives domain rules.
+9. Do not implement production code from this skill. Stop after docs unless the user asks
    for implementation in a separate step.
 
 ## Grilling Questions
 
-Ask only what is missing. Prefer 3-7 questions per round.
+Ask only what is missing. Ask one question per turn, then wait. Do not bundle multiple
+questions in the same assistant message.
+
+Each question must use this structure:
+
+```markdown
+<single focused question>
+
+Options:
+- 1. <specific answer>
+- 2. <specific answer>
+- 3. <specific answer, when useful>
+- 4. <specific answer, when useful>
+- Discuss this
+- Other
+```
+
+When the user chooses `Discuss this`, answer their concern or tradeoff briefly, then ask the
+same question again with revised options if needed. When the user chooses `Other`, treat their
+free-form answer as authoritative and continue to the next missing topic.
 
 Core:
 
