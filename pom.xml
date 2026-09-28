@@ -354,6 +354,50 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+                <id>quality-gate</id>
+                <build>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.diffplug.spotless</groupId>
+                            <artifactId>spotless-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>quality-gate-spotless-apply</id>
+                                    <phase>validate</phase>
+                                    <goals>
+                                        <goal>apply</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <ratchetFrom>origin/main</ratchetFrom>
+                                <java>
+                                    <googleJavaFormat/>
+                                    <replaceRegex>
+                                        <name>field-annotation-own-line</name>
+                                        <searchRegex>(?m)^([\t ]*)(@[A-Za-z_][A-Za-z0-9_$.]*)[\t ]+(private|protected|public)[\t ]+([^\n;]+;)[\t ]*$</searchRegex>
+                                        <replacement>$1$2&#10;$1$3 $4</replacement>
+                                    </replaceRegex>
+                                </java>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <groupId>com.github.spotbugs</groupId>
+                            <artifactId>spotbugs-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>quality-gate-spotbugs-check</id>
+                                    <phase>verify</phase>
+                                    <goals>
+                                        <goal>check</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </build>
+            </profile>
 	</profiles>
 
 </project>
